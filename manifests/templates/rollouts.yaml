@@ -1,0 +1,48 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: semana-devops
+spec:
+  replicas: 10
+  selector:
+    matchLabels:
+      app: semana-devops
+  template:
+    metadata:
+      labels:
+        app: semana-devops
+    spec:
+      containers:
+        - name: semana-devops
+          image: {{ .Values.image }}
+          ports:
+            - containerPort: 8081
+          startupProbe:
+            enabled: true
+            failureThreshold: 10
+            periodSeconds: 10
+            httpGet:
+              path: /startup
+              port: 8081
+          readinessProbe:
+            enabled: true
+            failureThreshold: 10
+            periodSeconds: 10
+            httpGet:
+              path: /readyz
+              port: 8081
+          livenessProbe:
+            enabled: true
+            failureThreshold: 10
+            periodSeconds: 10
+            httpGet:
+              path: /liveness
+              port: 8081
+  strategy:
+    canary:
+      steps:
+        - setWeight: 30
+        - pause: {}
+        - setWeight: 60
+        - pause: {}        
+        - setWeight: 100

@@ -45,6 +45,10 @@ def health_check():
     simulate_unhealthy_behavior_randomly()
     return {"status": "ok"}
 
+@app.get("/version", tags=["util"])
+def version_check():
+    """Verifica a versão da aplicação."""
+    return {"version": "2.0.0"}
 
 @app.get("/liveness", tags=["k8s"])
 def liveness_check():
@@ -64,10 +68,6 @@ def startup_check():
 @app.get("/", tags=["util"])
 def redirect_to_docs():
     return RedirectResponse(url="/docs")
-
-
-# Funções de simulação
-
 
 def simulate_heavy_load_randomly():
     """Simula um uso pesado aleatoriamente."""
